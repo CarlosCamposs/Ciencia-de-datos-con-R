@@ -169,7 +169,23 @@ ggplot()+
   geom_vline(xintercept = 5)
 
 # ------------------------------------------------------------------------------
+##########
+# Establecemos manualmente los colores que queremos mostrar en la grafica
 
+colores <- rep("black",times=11)
+colores[6]<-"red"
+
+
+ggplot()+
+  geom_line(data=total_sismos_recientes,
+            mapping = aes(x=mes,y=Total,color=factor(anio)))+
+  scale_x_continuous(breaks=1:12,labels=month.name)+
+  scale_color_manual(values=colores)
+        # 1. Solo buscamos resaltar el mes de septiembre con color rojo
+        #    y los demas de color negro
+
+
+# ------------------------------------------------------------------------------
 
 
 # Nuevas capas:
@@ -178,6 +194,7 @@ ggplot()+
 # theme(axis.text.x = ~ )
 # scale_x_continuous(): es cuando la variable NO es de tipo "fecha"
 # geom_vline(xintercept = ~ ): para agregar una linea vertical
+# scale_color_manual(values = ~ )
 
 
 # Podriamos aplicar color usando "color=factor(variable_datos)",
