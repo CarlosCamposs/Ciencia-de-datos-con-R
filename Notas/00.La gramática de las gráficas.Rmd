@@ -9,6 +9,9 @@ output: pdf_document
 library(nycflights13)
 library(tidyverse)
 library(knitr)
+library(moderndive)
+library(scales) # Sirve para escalas temporales (eje x)
+library(zoo)
 
 ```
 
@@ -16,6 +19,8 @@ library(knitr)
 setwd("C:/Users/Carlos Daniel/Desktop/GitHub/Ciencia-de-datos-con-R/datasets")
 sismos <- read.csv("sismos.csv")
 placas <- read.csv("Mexico_placas_tectonicas.csv")
+alaska_flights <- read.csv("alaska.csv")
+total_sismos_recientes <- read.csv("total_sismos_recientes.csv")
 ```
 
 
@@ -77,6 +82,171 @@ ggplot() +
 ```
 
 Hemos creado dos capas, una con `geom_point()` y otra con `geom_path()`, para cada una se ha especificado qué datos serán usados para la capa. El orden que impongamos sobre las capas importa, por lo que no será lo mismo poner primero la capa de `geom_path()` y posteriormente `geom_point()`, es decir, la visualización del gráfico sería distinta.
+\vspace{0.3cm}
+
+\newpage
+
+En caso de ser necesario, podriamos agregar una línea de regresión a los datos. Para este fin, primero se debe definir la capa que grafica los puntos con la función `geom_point()` y posteriormente se grafica la recta de regresión con la función `geom_smooth()`. Véase el siguiente ejemplo:
+
+## Ejemplo 2.3
+
+
+```{r,comment=NA, fig.height=3,warning=FALSE}
+ggplot() +
+  geom_point(data = alaska_flights,
+             mapping = aes(x = dep_delay, y = arr_delay))+
+  geom_smooth(data = alaska_flights,method="lm",
+              mapping = aes(x = dep_delay, y = arr_delay))
+```
+
+\newpage
+
+En caso de requerir una línea en específico que muestre un cohorte o simplemente sirva de ayuda visual se puede hacer uso de la función `geom_abline()`
+
+## Ejemplo 2.4
+
+```{r,comment=NA,fig.height=3,warning=FALSE}
+ggplot() +
+  geom_point(data = alaska_flights,
+             mapping = aes(x = dep_delay, y = arr_delay))+
+  geom_abline(slope=1,intercept = 0, color="red") # Se grafica la recta y=x
+
+```
+
+\newpage
+Cuando se tienen varios puntos conglomerados pudiera ser que la visualización del gráfico no sea tan clara, por lo que existen dos métodos para resvolver este problema de puntos conglomerados. El primero es especificar una transparencia a los puntos de la gráfica con el argumento `alpha`, como ya se ha usado anteriormente. 
+
+El segundo método consiste en meter  _nerviosismo_ a los datos, esto permitirá que los puntos puedan moverse a alguna posición aleatoria pero cercana a la posición original que tienen.
+
+## Ejemplo 2.5
+
+```{r,comment=NA, fig.height=3,warning=FALSE}
+ggplot() +
+  geom_point(data = alaska_flights,
+             mapping = aes(x = dep_delay, y = arr_delay),alpha=0.3)+
+  geom_jitter(data=alaska_flights,
+              mapping = aes(x = dep_delay, y = arr_delay),
+              width=0.5,height=0.5,alpha=0.3)
+
+```
+
+Con la función `geom_jitter()` se introduce el nerviosismo que queremos en los datos y usando los argumentos `width` y `heigth` se puede establecer qué tanta variación queremos. Es importante agregar suficiente fluctuación para romper cualquier superposición en los puntos, pero por otro lado, no tanta como para alterar completamente el patrón original en los puntos.
+
+
+\newpage
+
+# 3. Lineplots
+
+Los gráficos de línea muestran la relación entre dos variables numéricas cuando la variable del eje x, también llamada variable explicativa, es de naturaleza secuencial. En otras palabras, existe un ordenamiento inherente a la variable.
+
+## Ejemplo 3.1 
+
+```{r,comment=NA,warning=FALSE,fig.height=3}
+ggplot()+
+  geom_line(data=early_january_weather,
+             mapping = aes(x=time_hour,y=temp))
+
+```
+\vspace{0.3cm}
+
+En este caso definimos que el objeto geométrico que queremos son líneas, por ello se agrega la capa `geom_line()`. Todos los demás argumentos siguen la misma lógica ya mencionada en la gramática de las gráficas. 
+
+\newpage
+
+Una cosa de la que podemos percatarnos es que la escala del eje x no es tan clara, por lo que harmeos uso de la biblioteca `scales` para modificar el eje. Se debe agregar una nueva capa con `scale_x_datetime()`. 
+
+## Ejemplo 3.2
+```{r,comment=NA,warning=FALSE,fig.height=3}
+ggplot()+
+  geom_line(data=early_january_weather,
+            mapping = aes(x=time_hour,y=temp)) +
+  scale_x_datetime(breaks=date_breaks("1 day")) +
+  labs(x="Dia",y="Temperatura F")+
+  theme(axis.text.x=element_text(angle=45))
+```
+
+Con la capa `theme()` hemos especificado que queremos que los valores del eje x se giren 45°. Además, notemos que hemos cambiado el nombre de los ejes con la capa `labs()`.
+
+Existirán ocasiones donde en nuestros datos tengamos una columna que haga referencia a fechas pero no tenga el formato establecido como tal, por ejemplo
+```{r,comment=NA}
+class(total_sismos_recientes$mes_anio)
+```
+
+Con el uso de la biblioteca `zoo` podemos convertir la columna de `mes_anio` a fechas. En general, esta funcin se puede usar con cualquier columna que contenga datos que pudieran escribirse como fecha. 
+
+```{r,comment=NA}
+# La Y se usa en mayusucla, se pone "y" cuando solo tenemos los dos ultimos digitos
+fechas <-  as.yearmon(total_sismos_recientes$mes_anio,"%m/%Y") 
+head(fechas,5)
+```
+
+El resultado de implementar esto en una gráfica sería el siguiente:
+
+## Ejemplo 3.3
+```{r,comment=NA,fig.height=3}
+ggplot()+
+  geom_line(data=total_sismos_recientes,
+            mapping = aes(x=as.yearmon(mes_anio,"%m/%Y")
+                          , y=Total,
+                          color=factor(anio)) )+
+  labs(x="Mes/Año")
+
+```
+
+En el gráfico anterior hemos usado la función `factor()` para poder especificar que queremos tomar la variable `anio` como categorica. Cada año lo pintará de un color distinto y esa es la razón por la que el gráfico no es continuo, si no especificárams el argumento `color` podriamos visualizar el gráfico continuo.  
+
+
+\newpage
+
+Existe otra forma en la que podemos cambiar la escala del eje x y es mediante la capa `scale_x_continuous()`. El argumento `breaks` indicaría el número de marcas que queremos en el eje x mientras que el argumento `labels` hace referencia al vector que contiene los nombres de cada una de dichas marcas (deben coincidir en longitud).
+
+
+## Ejemplo 3.4
+```{r,comment=NA, fig.height=3}
+ggplot()+
+  geom_line(data=total_sismos_recientes,
+            mapping = aes(x=mes,y=Total,color=factor(anio)))+
+  scale_x_continuous(breaks=1:12,labels=month.name)
+
+```
+
+Este procedimiento se hizo de forma un poco más "manual". Sabemos a priori que el vector `mes` no representa fechas así que una alternativa para establecer fechas en el eje x es mediante la capa `scale_x_continuous()`.
+\newpage
+
+Previamente hemos visto que con la capa `geom_abline()` se puede graficar una recta especificando la pendiente y el intercepto. Existe otra forma de graficar una linea vertical u horizontal en una gráfica, para esto debemos usar la capa `geom_vline()` o `geom_hline()`, respectivamente. El siguiente gráfico muestra lo dicho:
+
+
+## Ejemplo 3.5
+
+```{r,comment=NA,fig.height=3}
+ggplot()+
+  geom_line(data=total_sismos_recientes,
+            mapping = aes(x=mes,y=Total,color=factor(anio)))+
+  scale_x_continuous(breaks=1:12,labels=month.name)+
+  geom_vline(xintercept = 5) # En el quinto "break"
+
+```
+\newpage
+
+
+En la gráfica anterior hemos establecido que el color de cada línea se determina por el argumento `color=factor(anio)`. Es posible establecer el color de cada una de las líneas con la capa `scale_color_manual()`, en el siguiente ejemplo se muestra cómo hacerlo
+
+## Ejemplo 3.6
+```{r,comment=NA, fig.height=3}
+colores <- rep("black",times=11)
+colores[6]<-"red"
+
+
+ggplot()+
+  geom_line(data=total_sismos_recientes,
+            mapping = aes(x=mes,y=Total,color=factor(anio)))+
+  scale_x_continuous(breaks=1:12,labels=month.name)+
+  scale_color_manual(values=colores)
+
+```
+
+
+
 
 \newpage
 
@@ -85,6 +255,28 @@ Hemos creado dos capas, una con `geom_point()` y otra con `geom_path()`, para ca
 * `geom_point()`: Permite realizar un scatter plot (_vg: Ejemplo 2.1_)
 
 * `geom_path()`: Grafica los puntos y los unirá mediante una línea (_vg: Ejemplo 2.2_)
+
+* `geom_smooth()`: Muestra la recta de regresión de un conjunto de puntos por LM (_vg: Ejemplo 2.3_)
+
+* `geom_abline()`: Traza una recta con la pendiente y el intercepto especificado (_vg: Ejemplo 2.4_)
+
+* `geom_line()`: Permite realizar un lineplot (_vg: Ejemplo 3.1_)
+
+* `scale_x_datetime(breaks=date_breaks("~"))`: Cambia la escala del eje x a la periodicidad que se especifique en `~` (_vg: Ejemplo 3.2_)
+
+* `labs(x='~', y='~')`: Cambia el nombre de ambos ejes por el que se especifique en `~` (_vg: Ejemplo 3.2_)
+
+* `theme(axis.text.x=element_text(angle=45))`: Gira 45° los valores que se muestran en el eje x (_vg: Ejemplo 3.2_)
+
+* `factor(~)`: Especificamos que queremos que `~` debe tomarla como variable categórica (_vg: Ejemplo 3.3_)
+
+* `scale_x_continuous(breaks= ~, labels= ~ )`: Pedimos que el eje x se divida en un cierto número de `breaks` y cada uno de ellos corresponde a un valor de `labels`. Muy útil. (_vg: Ejemplo 3.4_)
+
+* `month.name`: Es un vector que viene por default y contiene los nombres de los meses en inglés. (_vg: Ejemplo 3.4_)
+
+* `geom_vline(xintercept = ~)`: Permite graficar una linea vertical en algún punto del eje x (_vg: Ejemplo 3.5_)
+
+* `scale_color_manual(values= ~)`: Imprime las distintas líneas con los colores que se hayan especificado en el vector `~` (_vg: Ejemplo 3.6_)
 
 
 
