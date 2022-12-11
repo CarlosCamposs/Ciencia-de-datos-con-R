@@ -1,0 +1,91 @@
+---
+title: "Notas"
+author: "Carlos C."
+date: "2022-12-11"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(nycflights13)
+library(tidyverse)
+library(knitr)
+
+```
+
+```{r datos, include=FALSE}
+setwd("C:/Users/Carlos Daniel/Desktop/GitHub/Ciencia-de-datos-con-R/datasets")
+sismos <- read.csv("sismos.csv")
+placas <- read.csv("Mexico_placas_tectonicas.csv")
+```
+
+
+# 1. La gramática de los gráficos
+
+La gramática de los gráficos define un cojunto de reglas para construir gráficos estadísticos combinando diferentes tipos de "capas"
+
+## 1.1 Componentes
+
+La gramática nos dice que un gráfico estadístico es un **mapeo** de variables de **datos** a atributos **estéticos** de objetos **geométricos**. Un gráfico se puede dividir en tres  componentes esenciales:
+
+* **data**: conjunto de datos que contiene la variable de interés
+
+* **geom**: es el objeto geométrico en cuestión (puntos, líneas, barras, etc.)
+
+* **aes**: son los atributos estéticos del objeto geométrico ( posición x/y,color, forma, tamaño). Los atributos estétitos se  asignan a variables del conjuto de datos.
+
+
+\newpage
+
+# 2. Scatter plot
+
+
+El primer tipo de gráfico que se verá es el denominado gráfico de puntos. Permiten visualizar la relación entre dos variables numéricas.
+
+## Ejemplo 2.1
+
+```{r,comment=NA,fig.height=3}
+ggplot(data=sismos)+
+  geom_point(mapping=aes(x=Longitud,y=Latitud, color=zona),alpha=0.1)+
+  coord_map()
+
+```
+
+Notemos que
+
+* `aes` nos sirve para convertir columnas de datos en características. Todo dato que provenga de alguna columna tendrá que incluirse aquí.
+
+* Cualquier atributo estético que no provenga de alguna columna se tendrá que especificar fuera de `aes`
+
+* `alpha` es útil para establecer transparencias
+
+* El objeto geométrico se establece en puntos especificando `geom_point()`
+
+* Especificamos que el `color` de los puntos dependerá de los datos de `zona`
+
+Hemos establecido dentro de la función `ggplot()` los datos que debe tomar para realizar el gráfico. Este procedimiento es útil cuando tenemos una sola tabla que contenga todas las variables de nuestro interés, pero una **mejor práctica** es especificar la `data` en cada una de las capas que usemos. Veamos el siguiente ejemplo:
+
+\newpage
+
+## Ejemplo 2.2
+
+```{r,comment=NA,fig.height=3,warning=FALSE}
+ggplot() +
+  geom_point(data=sismos,mapping = aes(x=Longitud,y=Latitud,color=zona),alpha=0.1) +
+  geom_path(data=placas,mapping = aes(x=Longitud,y=Latitud,color=Tipo),size=2) +
+  coord_map()
+
+```
+
+Hemos creado dos capas, una con `geom_point()` y otra con `geom_path()`, para cada una se ha especificado qué datos serán usados para la capa. El orden que impongamos sobre las capas importa, por lo que no será lo mismo poner primero la capa de `geom_path()` y posteriormente `geom_point()`, es decir, la visualización del gráfico sería distinta.
+
+\newpage
+
+# 0. Acordeón
+
+* `geom_point()`: Permite realizar un scatter plot (_vg: Ejemplo 2.1_)
+
+* `geom_path()`: Grafica los puntos y los unirá mediante una línea (_vg: Ejemplo 2.2_)
+
+
+
+
