@@ -1,5 +1,5 @@
 # ///////////////////////////////////////////////////////////////////////////
-# Sesion 05 - Ciencia de datos con R
+# Sesion 07 - Ciencia de datos con R
 
 
 library(nycflights13)
