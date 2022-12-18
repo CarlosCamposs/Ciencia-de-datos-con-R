@@ -84,6 +84,7 @@ ggplot() +
                alpha = 0.5)
         # 1. Se usa geom_density para graficar la density
         # 2. La density se puede rellenar con "fill"
+
 # ------------------------------------------------------------------------------
 sismos <- read.csv("sismos.csv")
 
@@ -94,11 +95,13 @@ ggplot()+
 
 
 mis_entidades = c("OAX","BC","CHIS","GRO")
+
+mis_entidades = c("TLAX","MOR","GTO","CAMP")
 sismos_entidades = sismos %>% filter(entidad %in% mis_entidades)
         # Estos son los datos para algunas entidades (las definidias arriba)
 ggplot()+
-  geom_density(data=sismos_entidades,mapping=aes(x=Magnitud,fill=entidad),alpha=0.5)
-
+  geom_density(data=sismos_entidades,mapping=aes(x=Magnitud,fill=entidad),alpha=0.5)+
+  xlim(c(0,6))
 
 # ------------------------------------------------------------------------------
 # ylim(~), de forma similar xlim(~) (su argumento es un vector)
