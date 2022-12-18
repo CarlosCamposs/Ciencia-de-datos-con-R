@@ -244,9 +244,110 @@ ggplot()+
   scale_color_manual(values=colores)
 
 ```
+\newpage
+
+# 4. Histogram
+
+Consideremos la variable `temp` del dataframe `weather`. Podriamos estar interesados en cómo están distribuidos los valores de la temperatura, una forma de visualizar esto es trazando sus valores en una línea horizontal como se muestra a continuación:
+
+## Ejemplo 4.1
+```{r,comment=NA, fig.height=3, warning=FALSE}
+ggplot()+
+  geom_point(data=weather,mapping = aes(x=temp),
+             y=0,size=5,alpha=0.1)+
+  ylim(c(-0.25,0.25))+
+  scale_x_continuous(breaks=seq(0,100,10))
+
+```
+
+En `x` ponemos el valor de la temperatura y establecemos que en `y=0` se pongan todos los puntos, y como `y=0` no depende de alguna variable, se pone fuera de `aes()`. La función `ylim()` nos permite definir qué rango de valores queremos mostrar en el eje de las ordenadas. Lo que comunmente se usa para ver la conglomeración de los puntos anteriores es un histograma. Un histograma es un gráfico que visualiza la distribución de un valor numérico.
+
+\newpage
+
+## Histograma con frecuencia absoluta
+
+El primer histograma que se verá es aquel que tiene vfrecuencia absoluta en el eje de las ordenadas, esto se logra con la capa `geom_histogram()`. Solo es necesario especificar quien será la variable en el eje `x` dentro de `aes()` y notemos que se puede establecer el número de `bins` o el tamaño con `binwidth`. La sentencia `color` ilumina los bordes y la sentencia `fill` rellena los rectángulos. Para el número de bins se puede usar el Método de Sturges.
+
+## Ejemplo 4.2
+
+```{r,comment=NA,warning=FALSE, fig.height=2.5}
+ggplot()+
+  geom_histogram(data = weather,mapping = aes(x = temp),
+                 color = "green", fill="steelblue",
+                 bins=10)
+
+ggplot()+
+  geom_histogram(data = weather,mapping = aes(x = temp),
+                 color = "green", fill="steelblue",
+                 binwidth = 7.5)
+
+```
+\newpage
+
+## Histograma con frecuencia relativa
+
+Lo más común es visualziar histogramas con frecuencia relativa, esto se logra estableciendo `y=..densitiy..` dentro de las estéticas `aes()`. El valor de la ordenada se multiplica por 1000 para obtener el valor de la fracción. Se pueden introducir nuevamente las sentencias `bins` o `bindwidth`
+
+
+## Ejemplo 4.3
+
+```{r,comment=NA,fig.height=3, warning=FALSE}
+ggplot() +
+  geom_histogram(data = weather,
+                 mapping = aes(x=temp,y=..density..),
+                 color = "white", fill="steelblue",
+                 bins = 16)+
+  scale_y_continuous(labels = scales::percent)
+
+
+```
+
+Además, con la capa `scale_y_continuous()` hemos establecido que queremos mostrar el eje de las ordenadas como porcentajes. Con la función `colors()` podemos ver todas las posibles opciones que tenemos para los establecer colores en los gráficos de ggplot.
+```{r,comment=NA}
+# Mostramos los cinco primeros valores
+head(colors(),5)
+```
 
 
 
+\newpage
+
+Podemos dibujar el gráfico de densidad que corresponde al histograma con la capa `geom_density()`, en la cual podemos establecer argumentos como `color`, `fill`, `alpha`, etc. 
+
+## Ejemplo 4.4
+
+```{r,warning=FALSE,comment=NA,fig.height=3}
+ggplot() +
+  geom_histogram(data = weather,
+                 mapping = aes(x=temp,y=..density..),
+                 color = "white",fill="steelblue",
+                 bins = 10) +
+  geom_density(data = weather,
+               mapping = aes(x=temp),
+               color = "black",
+               fill = "yellow",
+               alpha = 0.5)
+```
+\newpage
+
+
+El gráfico de densidad permite visualizar una gráfica suavizada de los datos, podemos ilustrar varios gráficos de densidad con las siguientes líneas de código
+
+## Ejemplo 4.5
+```{r,comment=NA,warning=FALSE,fig.height=3}
+# Seleccionamos algunas entidades
+mis_entidades = c("TLAX","MOR","GTO","CAMP")
+
+# Nos quedamos con los datos de las entidades que definimos arriba
+sismos_entidades = sismos %>% filter(entidad %in% mis_entidades)
+
+ggplot()+
+  geom_density(data=sismos_entidades,mapping=aes(x=Magnitud,fill=entidad),alpha=0.5)+
+  xlim(c(0,6))
+
+```
+
+Notemos que, igual que antes, la geometría que se usa es `geom_density()` y dentro de las estéticas solo es necesario definir quién será la variable `x`, todo lo demás sigue respetando lo que se ha estudiado de la gramática de las gráficas.
 
 \newpage
 
@@ -277,6 +378,21 @@ ggplot()+
 * `geom_vline(xintercept = ~)`: Permite graficar una linea vertical en algún punto del eje x (_vg: Ejemplo 3.5_)
 
 * `scale_color_manual(values= ~)`: Imprime las distintas líneas con los colores que se hayan especificado en el vector `~` (_vg: Ejemplo 3.6_)
+
+* `ylim( c(a,b) )`: Permite definir los limites que se mostrarán en la gráfica (_vg: Ejemplo 4.1_)
+
+* `geom_histogram()`: Elabora un histograma de frecuencia absoluta. Como argumentos podemos poner las sentencias `bins` o `bind=width`, `fill` y `color` (_vg: Ejemplo 4.2_)
+
+* `colors()`: Muestra todas las posibles opciones de colores en `R`
+
+* `geom_density()`: Elabora un gráfico de densidad con los datos, estéticas y demás argumentos que se le definan. (_vg: Ejemplo 4.4_)
+
+
+
+
+
+
+
 
 
 
