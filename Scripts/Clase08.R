@@ -42,7 +42,7 @@ ggplot()+
 # Cuenta una vez "manzana" y una vez "naranja"
 
 # ------------------------------------------------------------------------------
-# Cuando se tiene la informacion PRECONTADA, se usa geom_bar()
+# Cuando se tiene la informacion PRECONTADA, se usa geom_col()
 
 
 ggplot() +
