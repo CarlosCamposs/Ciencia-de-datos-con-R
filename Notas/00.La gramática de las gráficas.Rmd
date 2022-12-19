@@ -24,11 +24,11 @@ total_sismos_recientes <- read.csv("total_sismos_recientes.csv")
 ```
 
 
-# 1. La gramática de los gráficos
+# 0. La gramática de los gráficos
 
 La gramática de los gráficos define un cojunto de reglas para construir gráficos estadísticos combinando diferentes tipos de "capas"
 
-## 1.1 Componentes
+##  Componentes
 
 La gramática nos dice que un gráfico estadístico es un **mapeo** de variables de **datos** a atributos **estéticos** de objetos **geométricos**. Un gráfico se puede dividir en tres  componentes esenciales:
 
@@ -38,6 +38,57 @@ La gramática nos dice que un gráfico estadístico es un **mapeo** de variables
 
 * **aes**: son los atributos estéticos del objeto geométrico ( posición x/y,color, forma, tamaño). Los atributos estétitos se  asignan a variables del conjuto de datos.
 
+
+\newpage
+# 1. Acordeón
+
+* `geom_point()`: Permite realizar un scatter plot (_vg: Ejemplo 2.1_)
+
+* `geom_path()`: Grafica los puntos y los unirá mediante una línea (_vg: Ejemplo 2.2_)
+
+* `geom_smooth()`: Muestra la recta de regresión de un conjunto de puntos por LM (_vg: Ejemplo 2.3_)
+
+* `geom_abline()`: Traza una recta con la pendiente y el intercepto especificado (_vg: Ejemplo 2.4_)
+
+* `geom_line()`: Permite realizar un lineplot (_vg: Ejemplo 3.1_)
+
+* `scale_x_datetime(breaks=date_breaks("~"))`: Cambia la escala del eje x a la periodicidad que se especifique en `~` (_vg: Ejemplo 3.2_)
+
+* `labs(x='~', y='~')`: Cambia el nombre de ambos ejes por el que se especifique en `~` (_vg: Ejemplo 3.2_)
+
+* `theme(axis.text.x=element_text(angle=45))`: Gira 45° los valores que se muestran en el eje x (_vg: Ejemplo 3.2_)
+
+* `factor(~)`: Especificamos que queremos que `~` debe tomarla como variable categórica (_vg: Ejemplo 3.3_)
+
+* `scale_x_continuous(breaks= ~, labels= ~ )`: Pedimos que el eje x se divida en un cierto número de `breaks` y cada uno de ellos corresponde a un valor de `labels`. Muy útil. (_vg: Ejemplo 3.4_)
+
+* `month.name`: Es un vector que viene por default y contiene los nombres de los meses en inglés. (_vg: Ejemplo 3.4_)
+
+* `geom_vline(xintercept = ~)`: Permite graficar una linea vertical en algún punto del eje x (_vg: Ejemplo 3.5_)
+
+* `scale_color_manual(values= ~)`: Imprime las distintas líneas con los colores que se hayan especificado en el vector `~` (_vg: Ejemplo 3.6_)
+
+* `ylim( c(a,b) )`: Permite definir los limites que se mostrarán en la gráfica (_vg: Ejemplo 4.1_)
+
+* `geom_histogram()`: Elabora un histograma de frecuencia absoluta. Como argumentos podemos poner las sentencias `bins` o `bind=width`, `fill` y `color` (_vg: Ejemplo 4.2_)
+
+* `colors()`: Muestra todas las posibles opciones de colores en `R`
+
+* `geom_density()`: Elabora un gráfico de densidad con los datos, estéticas y demás argumentos que se le definan. (_vg: Ejemplo 4.4_)
+
+* `facet_wrap(~variable, ncol=j, nrow=k)`: Permite dividir varios gráficos encimados en distintos plots, se debe especificar sobre qué variable se quiere dividir. (_vg: Ejemplo 5.1_)
+
+* `geom_boxplot()`: Permite realizar los gráficos de boxplot. (_vg: Ejemplo 6.1_)
+
+* `fill = ~`: Argumento que puede ser introducido en `aes()` para presentar gráficos segregados de acuerdo a alguna variable `~` (_vg: Ejemplo 6.3_)
+
+* `geom_bar()`: Permite realizar los gráficos de barra para `data` que NO están precontados (_vg: Ejemplo 7.1_)
+
+* `geom_col()`: Permite realizar los gráficos de barra para `data` que está precontada, es necesario especificar quien es `x` e `y` (_vg: Ejemplo 7.2_)
+
+* `table(~)`: Cuenta el número de observaciones que hay para cada nivel de una variable categórica `~` (_vg: Ejemplo 7.3_)
+
+* `geom_text()`: Permite escribir etiquetas en la gráfica, en el argumento `label= ~ ` se establece que vector `~` contiene los valores/etiquetas a ser mostrados en la gráfica (_vg: Ejemplo 7.3_)
 
 \newpage
 
@@ -410,52 +461,77 @@ ggplot() +
 ```
 
 Notemos que la variable `origin` solo puede tomar los valores `r unique(weather$origin)`, es decir, podemos tomarla como una variable categórica, así que al usar el argumento `fill=origin` estamos pidiendo que rellene los boxplot de acuerdo al origen, y como existen tres valores, pues hará tres gráficos para cada uno de los meses (en el eje x) que ya se tenía establecidos.
+\newpage
 
+
+# 7. Bar plot
+
+Una gráfica de barras es una manera para visualizar la distribución de una variable **categórica**. Esto es simple ya que estamos contando observaciones en las distintas categorias que se puede clasificar una variable (llamados niveles).
+
+Para poder realizar el gráfico será importante conocer si la variable de interés está "precontada" o no, puesto que se tendrán distintas formas de realizar el gráfico según sea el caso. Los niveles o factores son los distintos valores de la variable categórica, por ejemplo hombre o mujer son niveles.
+
+Cuando la información está dispersa, es decir, no está precontada se usa la capa `geom_bar()`:
+```{r,comment=NA, fig.height=3}
+# Generamos los datos no precontados
+frutas <- data.frame(tipo = c("manzana", "manzana", "naranja", "manzana", "naranja"))
+frutas
+
+```
+
+## Ejemplo 7.1 - geom_bar()
+```{r, comment=NA, fig.height=3}
+ggplot()+
+  geom_bar(data=frutas, mapping=aes(x=tipo),
+           fill=c("red","orange"), color="black")
+
+```
+
+Cabe notar que en la variable `x` se tiene que definir cuál es la variable sobre la cual va a realizar el conteo para luego hacer el gráfico de barras. En este caso nuestros datos no están precontados, tenemos registro por registro de los valores de la variable. Lo único que "se le da de comer" es la variable categórica (tipo, en este caso).
 
 \newpage
-# 0. Acordeón
 
-* `geom_point()`: Permite realizar un scatter plot (_vg: Ejemplo 2.1_)
-
-* `geom_path()`: Grafica los puntos y los unirá mediante una línea (_vg: Ejemplo 2.2_)
-
-* `geom_smooth()`: Muestra la recta de regresión de un conjunto de puntos por LM (_vg: Ejemplo 2.3_)
-
-* `geom_abline()`: Traza una recta con la pendiente y el intercepto especificado (_vg: Ejemplo 2.4_)
-
-* `geom_line()`: Permite realizar un lineplot (_vg: Ejemplo 3.1_)
-
-* `scale_x_datetime(breaks=date_breaks("~"))`: Cambia la escala del eje x a la periodicidad que se especifique en `~` (_vg: Ejemplo 3.2_)
-
-* `labs(x='~', y='~')`: Cambia el nombre de ambos ejes por el que se especifique en `~` (_vg: Ejemplo 3.2_)
-
-* `theme(axis.text.x=element_text(angle=45))`: Gira 45° los valores que se muestran en el eje x (_vg: Ejemplo 3.2_)
-
-* `factor(~)`: Especificamos que queremos que `~` debe tomarla como variable categórica (_vg: Ejemplo 3.3_)
-
-* `scale_x_continuous(breaks= ~, labels= ~ )`: Pedimos que el eje x se divida en un cierto número de `breaks` y cada uno de ellos corresponde a un valor de `labels`. Muy útil. (_vg: Ejemplo 3.4_)
-
-* `month.name`: Es un vector que viene por default y contiene los nombres de los meses en inglés. (_vg: Ejemplo 3.4_)
-
-* `geom_vline(xintercept = ~)`: Permite graficar una linea vertical en algún punto del eje x (_vg: Ejemplo 3.5_)
-
-* `scale_color_manual(values= ~)`: Imprime las distintas líneas con los colores que se hayan especificado en el vector `~` (_vg: Ejemplo 3.6_)
-
-* `ylim( c(a,b) )`: Permite definir los limites que se mostrarán en la gráfica (_vg: Ejemplo 4.1_)
-
-* `geom_histogram()`: Elabora un histograma de frecuencia absoluta. Como argumentos podemos poner las sentencias `bins` o `bind=width`, `fill` y `color` (_vg: Ejemplo 4.2_)
-
-* `colors()`: Muestra todas las posibles opciones de colores en `R`
-
-* `geom_density()`: Elabora un gráfico de densidad con los datos, estéticas y demás argumentos que se le definan. (_vg: Ejemplo 4.4_)
-
-* `facet_wrap(~variable, ncol=j, nrow=k)`: Permite dividir varios gráficos encimados en distintos plots, se debe especificar sobre qué variable se quiere dividir. (_vg: Ejemplo 5.1_)
-
-* `geom_boxplot()`: Permite realizar los gráficos de boxplot. (_vg: Ejemplo 6.1_)
-
-* `fill = ~`: Argumento que puede ser introducido en `aes()` para presentar gráficos segregados de acuerdo a alguna variable `~` (_vg: Ejemplo 6.3_)
+Cuando la información está precontada, es decir se tiene una columna con el número de observaciones de cada nivel se usa la capa `geom_col()`:
 
 
+```{r,comment=NA,fig.height=3}
+# Generamos los datos precontados
+frutas_contadas <- data.frame(tipo = c("manzana", "naranja"),total = c(3, 2)) 
+frutas_contadas
 
+```
+
+## Ejemplo 7.2 - geom_col()
+```{r,comment=NA, fig.height=3}
+ggplot() +
+  geom_col(data = frutas_contadas,
+           mapping = aes(x = tipo, y = total), fill=c("red","orange"),
+           color="black")
+
+```
+
+En este caso es necesario especificar quien es  la variable categórica `x` (que está constituida por niveles) y quién es la variable `y` (la altura del rectángulo).
+\newpage
+
+Podemos establecer etiquetas a los gráficos, el siguiente chunk de código ejemoplifica cómo se podría hacer para un barplot, pero para cualquier otro tipo de gráfico se sigue la misma lógica
+```{r,comment=NA}
+# Sacamos los valores (contados)
+valores <- as.data.frame(table(flights$carrier)) 
+names(valores) <- c("carrier","total")
+head(valores,5)
+```
+
+## Ejemplo 7.3
+```{r,comment=NA, fig.height=3}
+ggplot()+
+  geom_bar(data=flights, mapping=aes(x=carrier,fill=carrier) )+
+  geom_text(data=valores, 
+            mapping=aes(x=1:16,y=total+1500, label=total,color=carrier))  
+
+```
+
+
+Se usa la capa `geom_text()` para poder poner etiquetas (texto) en las gráficas, se basa  en coordenadas. Es importante notar que `total+1500` define una posición en cada una de las barras. El color de los númros y las barras coinciden pues el argumento `color` de `geom_text()` coincide con el argumento `fill` de `geom_bar()`
+
+Por otro lado, en el argumento `label` se especifica de qué variable se deben extraer las etiquetas para ponerlas en la gráfica.
 
 
