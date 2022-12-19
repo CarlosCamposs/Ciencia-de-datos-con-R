@@ -351,6 +351,68 @@ Notemos que, igual que antes, la geometría que se usa es `geom_density()` y den
 
 \newpage
 
+# 5. Facetas
+
+La creación de facetas se usa cuando nos gustaría dividir una visualización particular por los valores de otra variable. Esto creará varias copias del mismo tipo de gráfico con ejes `x` e `y` coincidentes, pero cuyo contenido diferirá. Por ejemplo, usando la gráfica anterior:
+
+## Ejemplo 5.1
+
+```{r,comment=NA, fig.height=5, warning=FALSE}
+ggplot()+
+  geom_density(data=sismos_entidades,mapping=aes(x=Magnitud,fill=entidad),alpha=0.5)+
+  xlim(c(0,6))+
+  facet_wrap(~entidad,nrow=2)
+
+
+```
+
+En la capa de `facet_wrap()` se debe especificar la variable sobre la cual se quiere hacer la división de los gráficos usando la sintaxis `~variable`. Esta capa admite otros argumentos como `ncol` y `nrow` pero el número de renglones debe ser un divisor. Notemos que es importante que las escalas `x` e `y` deben ser las mismas.
+
+
+\newpage
+
+
+# 6. Boxplots
+
+Un diagrama de caja se construye a partir de la información provista en el resumen de cinco valores numéricos de una variable numérica;  el mínimo, primer cuartil, mediana, tercer cuartil y máximo. Los bigotes de las cajas no se extienden mas de 1.5xRI, donde RI es el rango intercuartílico. Se realizará un diagrama de baja de las temperaturas
+
+## Ejemplo 6.1
+```{r,comment=NA,fig.height=4,warning=FALSE}
+ggplot()+
+  geom_boxplot(data=weather,mapping=aes(x=factor(month),y=temp,fill=factor(month)))
+
+```
+
+En el eje `y` establecemos la variable sobre la cual queremos msotrar los boxplot y en el eje `x` para considerar los distintos meses. Se usó `factor()` para que `R` los interprete como grupos (variables categóricas).
+\newpage
+
+## Ejemplo 6.2
+
+Se podrían crear los boxplot de forma horizontal simplemente intercambiando los ejes `x` e `y`.
+
+```{r,comment=NA,fig.height=4,warning=FALSE}
+ggplot()+
+  geom_boxplot(data=weather,mapping=aes(y=factor(month),x=temp,fill=factor(month)))
+
+```
+
+\newpage
+
+
+Una propiedad importante que se puede emplear a la hora de crear gráficos es poder usar el argumento `fill` para segmentar los gráficos de acuerdo a una variable categórica. Usaremos el dataframe `weather` y queremos mostrar los boxplot de las temperaturas para cada uno de los meses, además se pide mostrar esta información segregando el origen.
+
+## Ejemplo 6.3
+```{r,comment=NA, warning=FALSE}
+ggplot() +
+  geom_boxplot(data = weather,
+               mapping = aes(x=factor(month),y=temp,
+                             fill=origin))
+```
+
+Notemos que la variable `origin` solo puede tomar los valores `r unique(weather$origin)`, es decir, podemos tomarla como una variable categórica, así que al usar el argumento `fill=origin` estamos pidiendo que rellene los boxplot de acuerdo al origen, y como existen tres valores, pues hará tres gráficos para cada uno de los meses (en el eje x) que ya se tenía establecidos.
+
+
+\newpage
 # 0. Acordeón
 
 * `geom_point()`: Permite realizar un scatter plot (_vg: Ejemplo 2.1_)
@@ -387,11 +449,11 @@ Notemos que, igual que antes, la geometría que se usa es `geom_density()` y den
 
 * `geom_density()`: Elabora un gráfico de densidad con los datos, estéticas y demás argumentos que se le definan. (_vg: Ejemplo 4.4_)
 
+* `facet_wrap(~variable, ncol=j, nrow=k)`: Permite dividir varios gráficos encimados en distintos plots, se debe especificar sobre qué variable se quiere dividir. (_vg: Ejemplo 5.1_)
 
+* `geom_boxplot()`: Permite realizar los gráficos de boxplot. (_vg: Ejemplo 6.1_)
 
-
-
-
+* `fill = ~`: Argumento que puede ser introducido en `aes()` para presentar gráficos segregados de acuerdo a alguna variable `~` (_vg: Ejemplo 6.3_)
 
 
 
