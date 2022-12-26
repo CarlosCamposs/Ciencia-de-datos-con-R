@@ -44,7 +44,7 @@ flights %>%
 
 ### Podemos buscar variables (columnas) que cumplan ciertas condiciones:
 # Palabras que empiecen con ~
-flights %>% select(starts_with(("a"))) %>% names()
+flights %>% select(starts_with("a")) %>% names()
 
 # Palabras que terminen con ~
 flights %>% select(ends_with("e")) %>% names()
